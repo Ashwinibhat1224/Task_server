@@ -1,0 +1,111 @@
+<html>
+
+<head>
+    <link rel="stylesheet" type="text/css" href="../CSS/style.css">
+    <script src="../jquery-3.3.1.min.js"></script>
+
+</head>
+
+<body>
+
+    <center>
+        <form>
+
+            <input type="button" id="insert" class="button1" value="ADD NEW" onclick="window.location.href='../forms/AddData.html'"><br /><br />
+            <!--<input type="button" id="submit" value="SHOW TABLE">-->
+
+            <div id="tabl">
+            </div>
+
+        </form>
+
+    </center>
+    <script>
+
+        var myObj = new Object();
+        var table = '';
+
+        $(document).ready(function () {
+            //$("#submit").click(function () {
+
+            var name = $("#name").val();
+            var email = $("#email").val();
+            var phone = $("#phone").val();
+            var address = $("#address").val();
+            var gender = $("#gender").val();
+
+            myObj = { "name": name, "email": email, "phone": phone, "address": address, "gender": gender };
+
+            $.ajax({
+                type: 'GET',
+                url: 'http://172.104.190.30:7777/api/v1/users',
+                //contentType:'application/json',
+                //data:myObj,
+                dataType: "JSON",
+                success: function (response) {
+
+                    var arrVal = response.data;
+                    var id = arrVal.map(x => x._id);
+                    //console.log(ids);
+                    var arrName = arrVal.map(x => x.name);
+                    var arrEmail = arrVal.map(x => x.email);
+                    var arrPhone = arrVal.map(x => x.phone);
+                    var arrAddress = arrVal.map(x => x.address);
+                    var arrGender = arrVal.map(x => x.gender);
+
+                    table += '<tr>'
+                    table += '<th>' + "NAME" + '</th><th>' + "EMAIL" + '</th><th>' + "PHONE NUMBER" + '</th><th>' + "ADDRESS" + '</th><th>' + "GENDER" + '</th><th>' + "EDIT" + '</th><th>' + "DELETE" + '</th></tr>';
+
+                    for (var i = 0; i < arrName.length; i++) {
+                        table += '<tr>'
+                        table += '<td>' + arrName[i] + '</td>'
+                        table += '<td>' + arrEmail[i] + '</td>'
+                        table += '<td>' + arrPhone[i] + '</td>'
+                        table += '<td>' + arrAddress[i] + '</td>'
+                        table += '<td>' + arrGender[i] + '</td>'
+
+                        table += '<td>' + '<a href="../forms/AddData.html?id=' + id[i] + '"><img src="../image/edit.png"  height="20px" width="20px">' + '</a></td>'
+                        table += '<td>' + '<img src="../image/delete.png" height="20px" width="20px" class="del" id=' + id[i] + ' >' + '</td>'
+                        table += '</tr>';
+
+                    }
+                    $("#tabl").append(table);
+
+                    $(".del").click(function () {
+                        var checkId = this.id;
+                        console.log(checkId);
+                        var url1 = 'http://172.104.190.30:7777/api/v1/users/' + checkId;
+                        console.log(url1);
+
+                        $.ajax({
+
+                            type: 'DELETE',
+                            url: url1,
+                            dataType: 'JSON',
+                            success: function (res) {
+                                console.log(res);
+                                alert("Data deleted successfully");
+                                window.location.href = "../grid/showTable.html";
+                            },
+                            error: function () {
+                                console.log("error");
+
+                            }
+                        });
+
+
+                    });
+                },
+                error: function () {
+                    console.log("error");
+
+                }
+
+            });
+
+        })
+    </script>
+
+</body>
+
+</html>

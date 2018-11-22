@@ -1,0 +1,154 @@
+<html>
+
+<head>
+    <link rel="stylesheet" type="text/css" href="../CSS/style.css">
+    <script src="../jquery-3.3.1.min.js"></script>
+
+</head>
+
+<body>
+    <center>
+        <div class="box">
+            <form>
+                <p><b>Adding User Information</b></p>
+                <div>
+                    <label>Name :</label>
+                    <input type="text" name="name" id="name"><br><br>
+                </div>
+                <div>
+                    <label>Email :</label>
+                    <input type="text" name="email" id="email"><br><br>
+                </div>
+
+                <div>
+                    <label>Phone no :</label>
+                    <input type="text" name="phone" id="phone"><br><br>
+                </div>
+                <div>
+                    <label>Address :</label>
+                    <textarea rows="5" cols="25" name="name" id="address"></textarea><br><br>
+                </div>
+                <div>
+                    <label>Gender :</label>
+                    <select id="gender">
+                        <option value="MALE">MALE</option>
+                        <option value="FEMALE">FEMALE</option>
+                    </select>
+
+                </div>
+                <br /><br />
+                <input type="button" value="SUBMIT" id="submit" class="button1">
+                <input type="reset" value="CLEAR" id="clr" class="button1"><br /><br />
+                <input type="button" value="BACK" id="back" onclick="window.location.href='../grid/showTable.html'"
+                    class="button1">
+
+            </form>
+        </div>
+    </center>
+    <script>
+        var myObj = new Object();
+
+        $(document).ready(function () {
+
+            var url = window.location.href;
+            var checkId = "?id=";
+
+            if (url.indexOf(checkId) == -1) {
+                $("#submit").click(function () {
+
+                    var name = $("#name").val();
+                    var email = $("#email").val();
+                    var phone = $("#phone").val();
+                    var address = $("#address").val();
+                    var gender = $("#gender").val();
+
+                    myObj = { "name": name, "email": email, "phone": phone, "address": address, "gender": gender };
+                    //var myJSON = JSON.stringify(myObj);
+                    //alert(myObj);
+                    console.log(myObj);
+
+                    $.ajax({
+                        type: 'POST',
+                        url: 'http://172.104.190.30:7777/api/v1/users',
+                        //contentType:'application/json',
+                        data: myObj,
+                        dataType: "JSON",
+                        success: function (response) {
+                            console.log("Done");
+                            //console.log(response);
+                            window.location.href = "../grid/showTable.html";
+                        },
+                        error: function () {
+                            console.log("error");
+                        }
+                    });
+
+                })
+            }
+            else {
+                //var url = window.location.href;
+                var myvar = url.split('?');
+                var id = myvar[1].split("=");
+                var id1 = id[1];
+
+                var url1 = "http://172.104.190.30:7777/api/v1/users/" + id1;
+
+                $.ajax({
+                    type: 'GET',
+                    url: url1,
+                    dataType: "JSON",
+                    success: function (response) {
+                        console.log(response);
+                        var data = response.data;
+                        console.log(data.name);
+
+                        $("#name").val(data.name);
+                        $("#email").val(data.email);
+                        $("#phone").val(data.phone);
+                        $("#address").val(data.address);
+                        $("#gender").val((data.gender).toUpperCase());
+                    },
+                    error: function () {
+                        console.log('Error: ');
+                    }
+                });
+
+                $("#cancel").click(function () {
+                    window.location.href = "../grid/showTable.html";
+                })
+
+                $("#submit").click(function () {
+                    var name = $("#name").val();
+                    var email = $("#email").val();
+                    var phone = $("#phone").val();
+                    var address = $("#address").val();
+                    var gender = $("#gender").val();
+
+
+                    myObj = { "name": name, "email": email, "phone": phone, "address": address, "gender": gender };
+                    //console.log(myObj);
+
+                    var url2 = "http://172.104.190.30:7777/api/v1/users/" + id1;
+
+                    $.ajax({
+                        type: 'PUT',
+                        url: url2,
+                        data: myObj,
+                        dataType: "JSON",
+                        success: function (response) {
+                            console.log(response);
+                            //alert("Data Updated Successfully");
+                            window.location.href = "../grid/showTable.html";
+                        },
+                        error: function () {
+                            console.log('Error: ');
+                        }
+                    });
+                })
+            }
+        })
+    </script>
+
+</body>
+
+</html>
